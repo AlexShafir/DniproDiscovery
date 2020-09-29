@@ -1,0 +1,15 @@
+{
+	"name": "EarthObservatory Dataset Recommender",
+	"version": "1.0",
+	"description": "Augments EarthObservatory stories with datasets from EarthData.",
+	"manifest_version": 2,
+	"content_scripts": [
+		{
+		"matches": [
+			"https://earthobservatory.nasa.gov/images/*/*",
+			"https://earthobservatory.nasa.gov/blogs/*",
+			"https://earthobservatory.nasa.gov/features/*"],
+		"js": ["main.js"]
+		}
+	]
+}

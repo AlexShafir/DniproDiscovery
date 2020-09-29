@@ -3,6 +3,10 @@
 	"version": "1.0",
 	"description": "Augments EarthObservatory stories with datasets from EarthData.",
 	"manifest_version": 2,
+	"permissions": [
+        	"https://gentle-sea-38259.herokuapp.com/*",
+		"https://cmr.earthdata.nasa.gov/search/*"
+    	],
 	"content_scripts": [
 		{
 		"matches": [

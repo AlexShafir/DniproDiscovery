@@ -5,6 +5,11 @@
 //Appending to DOM 
 //document.body.appendChild(btn);
 
+fetch('https://gentle-sea-38259.herokuapp.com/')
+  .then((data) => {
+    console.log(data);
+  });
+
 const t = document.body.children.item(5).children.item(1);
 const div = document.createElement('div');
 div.className = "flex-container";

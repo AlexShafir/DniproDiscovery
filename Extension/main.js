@@ -12,7 +12,7 @@ fetch('https://gentle-sea-38259.herokuapp.com/', {
     'Content-Type': 'text/plain'
   },
   body: document.URL
-});)
+ })
   .then(data => data.json())
   .then(dict => {
 const para = document.createElement("P");

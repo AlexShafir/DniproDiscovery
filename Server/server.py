@@ -1,6 +1,7 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import os
 import json
+from io import BytesIO
 
 dummy = {
 

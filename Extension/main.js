@@ -1,15 +1,3 @@
-//Creating Elements
-//var btn = document.createElement("BUTTON")
-//var t = document.createTextNode("CLICK ME");
-//btn.appendChild(t);
-//Appending to DOM 
-//document.body.appendChild(btn);
-
-fetch('https://gentle-sea-38259.herokuapp.com/')
-  .then((data) => {
-    console.log(data);
-  });
-
 const t = document.body.children.item(5).children.item(1);
 const div = document.createElement('div');
 div.className = "flex-container";
@@ -17,16 +5,16 @@ div.style.display="flex";
 div.style.flexDirection="column";
 div.style.paddingBottom = "50px";
 
-const dict = {
 
-"'Latent reserves' within the Swiss NFI":"https://search.earthdata.nasa.gov/search/granules?p=C1931110427-SCIOPS",
-
-"(U-Th)/He ages from the Kukri Hills of southern Victoria Land":"https://search.earthdata.nasa.gov/search/granules?p=C1214587974-SCIOPS"
-
-};
-
-
-
+fetch('https://gentle-sea-38259.herokuapp.com/', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'text/plain'
+  },
+  body: document.URL
+});)
+  .then(data => data.json())
+  .then(dict => {
 const para = document.createElement("P");
 
 if (Object.keys(dict).length === 0) {
@@ -50,6 +38,6 @@ for (const [key, value] of Object.entries(dict)) {
 	div.appendChild(a);
 }
 
-
-
 t.insertBefore(div, t.children.item(1));
+});
+

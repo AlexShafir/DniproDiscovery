@@ -1,5 +1,5 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
-
+import os
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
@@ -8,6 +8,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(b'Hello, world!')
 
-PORT = int(environ.get('PORT', "8080"))
+PORT = int(os.environ.get('PORT', "8080"))
 httpd = HTTPServer(('localhost', PORT), SimpleHTTPRequestHandler)
 httpd.serve_forever()

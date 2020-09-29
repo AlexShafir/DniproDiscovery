@@ -10,8 +10,8 @@
 		{
 		"matches": [
 			"https://earthobservatory.nasa.gov/images/*/*",
-			"https://earthobservatory.nasa.gov/blogs/*",
-			"https://earthobservatory.nasa.gov/features/*"],
+			"https://earthobservatory.nasa.gov/blogs/*/*/*/*/*",
+			"https://earthobservatory.nasa.gov/features/*/*"],
 		"js": ["main.js"]
 		}
 	]

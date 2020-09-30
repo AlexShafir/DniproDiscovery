@@ -37,7 +37,12 @@ for (const [key, value] of Object.entries(dict)) {
 
 	div.appendChild(a);
 }
+if (document.URL.includes("features")) {
+	t.insertBefore(div, t.children.item(0));
+}
+else { // blogs, images
+	t.insertBefore(div, t.children.item(1));
+}
 
-t.insertBefore(div, t.children.item(1));
 });
 

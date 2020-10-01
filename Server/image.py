@@ -70,11 +70,15 @@ def parse(url):
         res = requests.get(f"https://cmr.earthdata.nasa.gov/search/collections.json?point={lon},{lat}&platform={plat}&instrument={instr}&has_granules=true&pretty=true")
         items = json.loads(res.text, object_hook=lambda d: SimpleNamespace(**d))
 
-
-
-        # Filter collections by date
+        # Iterate collections
 
         for e in items.feed.entry:
+
+            # Filter by granules
+            res = requests.get(f"https://cmr.earthdata.nasa.gov/search/granules.json?collection_concept_id={e.id}&point={lon},{lat}&pretty=true")
+            granules = json.loads(res.text, object_hook=lambda d: SimpleNamespace(**d))
+
+            if len(granules.feed.entry) == 0: continue
 
             colIds.append([e.title, e.id])
 

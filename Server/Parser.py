@@ -13,6 +13,3 @@ def parse(url):
         out[id[0]] = s
 
     return out
-
-#t = parse("https://earthobservatory.nasa.gov/images/147269/fires-char-#the-pantanal")
-print(t)

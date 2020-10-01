@@ -14,5 +14,5 @@ def parse(url):
 
     return out
 
-t = parse("https://earthobservatory.nasa.gov/images/147269/fires-char-the-pantanal")
+#t = parse("https://earthobservatory.nasa.gov/images/147269/fires-char-#the-pantanal")
 print(t)

@@ -23,7 +23,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         content_length = int(self.headers.get('Content-Length'))
-        body = self.rfile.read(content_length)
+        body = self.rfile.read(content_length).decode("utf-8")
         out = Parser.parse(body)
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')

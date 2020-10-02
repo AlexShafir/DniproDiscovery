@@ -26,7 +26,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         content_length = int(self.headers.get('Content-Length'))
         body = self.rfile.read(content_length).decode("utf-8")
-        self.send_header('Access-Control-Allow-Origin', '*')
+        
         
         try:
             out = Parser.parse(body)
@@ -34,6 +34,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             text = traceback.format_exc()
             logging.error(text)
             self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
             response = BytesIO()
             response.write(str.encode(text))
@@ -42,7 +43,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
           
         self.send_response(200)
-        
+        self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
         response = BytesIO()
         response.write(str.encode(json.dumps(out)))

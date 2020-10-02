@@ -1,4 +1,4 @@
-import requests
+﻿import requests
 from bs4 import BeautifulSoup
 import json
 from types import SimpleNamespace
@@ -49,6 +49,7 @@ def parse(url):
         articleText = articleText + "\n" + p.text
 
     ## Dates from images
+    """
     dateP = soup.select('div.panel-footer > p')
     dates = []
     for p in dateP:
@@ -58,6 +59,7 @@ def parse(url):
         dates.append(t)
 
     dates = list(set(dates))
+    """
 
     ## todo: Provider
 

@@ -20,9 +20,8 @@ fetch('https://gentle-sea-38259.herokuapp.com/', {
 
 	if(res.status == 200) {
 
-		dict = res.json();
-
-if (Object.keys(dict).length === 0) {
+		res.json().then(dict => {
+			if (Object.keys(dict).length === 0) {
 	para.innerHTML = "Relevant datasets: None";
 } else {
 	para.innerHTML = "Relevant datasets:";
@@ -49,10 +48,15 @@ else { // blogs, images
 	t.insertBefore(div, t.children.item(1));
 }
 
+		});
+
+
 	} else if (res.status == 500) {
 		para.innerHTML = "Relevant datasets: Parser error";
-		console.log(res.text());
 		div.appendChild(para);
+
+		res.text().then(text => console.log(text));
+		
 	}
 });
 

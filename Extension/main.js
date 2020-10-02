@@ -14,11 +14,13 @@ fetch('https://gentle-sea-38259.herokuapp.com/', {
   body: document.URL
  })
   .then(res => {
+
+	const para = document.createElement("P");
+
+
 	if(res.status == 200) {
 
 		dict = res.json();
-	
-const para = document.createElement("P");
 
 if (Object.keys(dict).length === 0) {
 	para.innerHTML = "Relevant datasets: None";
@@ -50,6 +52,7 @@ else { // blogs, images
 	} else if (res.status == 500) {
 		para.innerHTML = "Relevant datasets: Parser error";
 		console.log(res.text());
+		div.appendChild(para);
 	}
 });
 

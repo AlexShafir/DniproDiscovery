@@ -117,9 +117,13 @@ def process(parsed):
     colIds = []
     if(len(platInstr)==0):
         def generate_all_pairs(platforms, instruments):
+            res = []
             for plt in platforms:
                 for instr in instruments:
-                    platInstr.append([plt,instr])
+                    res.append([plt,instr])
+            return res
+        platInstr = generate_all_pairs(from_text_platforms, from_text_instruments)
+    # todo: add search by only platfrom or by only instrument
     for item in platInstr:
         plat, instr = item
         res = requests.get(

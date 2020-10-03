@@ -66,11 +66,13 @@ class TextAnalysis:
         self.text = text # text of the article
         self.args = args # additional arguments: (Table of contents, References & Resources, etc)
 
+    # todo: delete
     def preprocess(self, text):
         data = nltk.word_tokenize(text)
         data = nltk.pos_tag(data)
         return data
 
+    # todo: delete
     def NLTK_tags(self, text):
         res = self.preprocess(text)
         return res
@@ -141,10 +143,11 @@ class TextAnalysis:
 
         return res
 
-    def keywords_extraction(self, text):
+    def keywords_extraction(self, text, num=10):
         """
         Returns most popular words from the text
         :param text:
+        :param num: number of most popular words
         :return:
         """
         # nlp = en_core_web_sm.load()

@@ -5,7 +5,12 @@ from types import SimpleNamespace
 from datetime import datetime
 
 def parse(url):
-    pass
+    return {
+        "title":"",
+        "text":"",
+        "tags":"",
+        "R&R":"",
+    }
 
 def process(parsed):
     pass

@@ -45,8 +45,8 @@ all_platforms = all_possibilities_with_el(all_platforms, "/")
 all_instruments = all_possibilities_with_el(instruments, "-")
 all_instruments = all_possibilities_with_el(all_instruments, "/")
 
-print(f'All possible platforms names: {all_platforms}')
-print(f'All possible instruments names: {all_instruments}')
+# print(f'All possible platforms names: {all_platforms}')
+# print(f'All possible instruments names: {all_instruments}')
 
 
 

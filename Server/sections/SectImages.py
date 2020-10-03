@@ -3,6 +3,9 @@ from bs4 import BeautifulSoup
 import json
 from types import SimpleNamespace
 from datetime import datetime
+import sys
+sys.path.append("..")
+import nlp
 
 def parse(url):
 
@@ -62,28 +65,61 @@ def parse(url):
     """
 
     return {
+        "title":"",
+        "text":"",
+        "tags":"",
+        "dates":[],
+        "R&R":"",
         "platInstr": platInstr,
         "coord": [lat, lon],
-
     }
 
-def process(dict):
+def process(parsed):
+
     """
 
-    :param dict: Must contain "platInstr", "coord"
-    :type dict: dict
+    :param parsed: Must contain
+        "title":"",
+        "text":"",
+        "tags":"",
+        "dates":[],
+        "R&R":"",
+        "platInstr": platInstr,
+        "coord": [lat, lon],
+    :type parsed: dict
 
     :return: list of ids
     :rtype: list
 
     """
+    title = parsed["title"]
+    text = parsed["text"]
+    tags = parsed["tags"]
+    dates = parsed["dates"]
+    R_and_R = parsed["R&R"]
+    lat, lon = parsed["coord"]
+    platInstr = parsed["platInstr"]
 
-    lat, lon = dict["coord"]
-    platInstr = dict["platInstr"]
+    ### TEXT INFO :
+    args = {"R&R":parsed["R&R"]}
+    tA = nlp.TextAnalysis(title=title, text=text, args=args )
+    text_tags = tA.spaCy_tags(tA.text)
+
+    from_text_instruments = tA.instruments_extraction(text_tags)
+    from_text_platforms = tA.platforms__extraction(text_tags)
+    from_text_locations = tA.locations_extraction(text_tags)
+    from_text_dates = tA.dates_extraction(text_tags)
+    from_text_tags = tA.keywords_extraction(tA.text, 10)
+
+    ### PROCESSING :
 
     # Now we have everything from article and can filter results
     colIds = []
-
+    if(len(platInstr)==0):
+        def generate_all_pairs(platforms, instruments):
+            for plt in platforms:
+                for instr in instruments:
+                    platInstr.append([plt,instr])
     for item in platInstr:
         plat, instr = item
         res = requests.get(
@@ -104,7 +140,6 @@ def process(dict):
             colIds.append([e.title, e.id])
 
             """
-
             if hasattr(e, 'time_end'):
                 dateEnd = datetime.strptime(e.time_start, '%Y-%m-%dT%H:%M:%S.%fZ')
                 atleastEnd = False
@@ -125,6 +160,6 @@ def process(dict):
             if not atleastStart: continue
             """
 
-        # print(res.text)
+    # print(res.text)
 
     return colIds

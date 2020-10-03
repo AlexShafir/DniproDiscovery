@@ -23,3 +23,8 @@ def parse(url):
         out[id[0]] = s
 
     return out
+
+
+# Test
+#x = SectImages.parse("https://earthobservatory.nasa.gov/images/147350/spalte-splits")
+#print(x)

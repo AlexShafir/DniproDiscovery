@@ -2,7 +2,7 @@
 from bs4 import BeautifulSoup
 import json
 from types import SimpleNamespace
-from datetime import datetime
+import re
 
 def parse(url):
 
@@ -11,6 +11,21 @@ def parse(url):
     soup = BeautifulSoup(res.text, 'html.parser')
 
     # In "images" we can extract: point coordinate, instrument, platform, provider, dates from images
+
+    ## Title
+    title = soup.find("meta", attrs={"name":"DC.Title"})['content']
+
+    ## Tags
+    tagz = soup.select("a.btn.btn-tag.hvr-rectangle-in.btn-sm")
+    tags = []
+    for i in tagz:
+        tags.append(i.text)
+
+    ## R & R
+    linkz = soup.select("div.col-xs-12.references-content > ul > li")
+    links = []
+    for i in linkz:
+        links.append(i.text)
 
     ## Coordinate
     coord = soup.select_one('p.text-center.map-link > a')['href'].split('/')
@@ -49,37 +64,42 @@ def parse(url):
         articleText = articleText + "\n" + p.text
 
     ## Dates from images
-    """
+
     dateP = soup.select('div.panel-footer > p')
     dates = []
     for p in dateP:
         t = p.contents[0]
         if '-' in t: continue
-        t = datetime.strptime(t, '%B %d, %Y')
-        dates.append(t)
+        match = re.match(r'.*([1-2][0-9]{3})', t)
+        if match is not None:
+            dates.append(int(match.group(1)))
 
     dates = list(set(dates))
-    """
+
 
     return {
         "platInstr": platInstr,
         "coord": [lat, lon],
-
+        "title": title,
+        "tags": tags,
+        "dates": dates,
+        "R&R": links,
+        "text": articleText
     }
 
-def process(dict):
+def process(parsed):
     """
 
-    :param dict: Must contain "platInstr", "coord"
-    :type dict: dict
+    :param parsed: Must contain "platInstr", "coord"
+    :type parsed: dict
 
     :return: list of ids
     :rtype: list
 
     """
 
-    lat, lon = dict["coord"]
-    platInstr = dict["platInstr"]
+    lat, lon = parsed["coord"]
+    platInstr = parsed["platInstr"]
 
     # Now we have everything from article and can filter results
     colIds = []
@@ -103,28 +123,5 @@ def process(dict):
 
             colIds.append([e.title, e.id])
 
-            """
-
-            if hasattr(e, 'time_end'):
-                dateEnd = datetime.strptime(e.time_start, '%Y-%m-%dT%H:%M:%S.%fZ')
-                atleastEnd = False
-                for date in dates:
-                    if dateEnd > date:
-                        atleastEnd = True
-                        break
-
-                if not atleastEnd: continue
-
-            atleastStart = False
-            dateStart = datetime.strptime(e.time_start, '%Y-%m-%dT%H:%M:%S.%fZ')
-            for date in dates:
-                if dateStart < date:
-                    atleastStart = True
-                    break
-
-            if not atleastStart: continue
-            """
-
-        # print(res.text)
 
     return colIds

@@ -115,16 +115,25 @@ class TextAnalysis:
         :return: coordinates of suiting locations
         """
         locations = [pair for pair in pairs if pair[1] in spaCy_location_tags]
-        # todo: delete continents, delete big countries
-        locations = set([loc[0] for loc in locations if( len(loc[0]) > 3  and
-                                                  loc[0]!='Earth')])
+
+        locations = [loc[0] for loc in locations if( len(loc[0]) > 3  and
+                                                  loc[0]!='Earth')]
 
         res = {}
         for loc in locations:
             coords = extract_lat_long_via_address(loc)
             if(coords[0]!=None):
-                res[loc] = coords
-        return res
+                if(loc.lower() in res.keys()):
+                    res[loc.lower()][1] += 1
+                else:
+                    res[loc.lower()] = [coords,1]
+        print(f'In text locations:{res}')
+        locations = []
+        for key in res.keys():
+            locations.append(res[key])
+        locations.sort(key = lambda x: x[1], reverse=True)
+        best_locations = [loc[0] for loc in locations if loc[1]>3]
+        return best_locations
 
     def dates_extraction(self, pairs):
         """
@@ -167,7 +176,7 @@ class TextAnalysis:
             return result  # 5
 
         output = get_hotwords(text)
-        most_popular = [x[0] for x in Counter(output).most_common(10)]
+        most_popular = [x[0].lower() for x in Counter(output).most_common(10)]
         return most_popular
 
 def main(title, text, args):

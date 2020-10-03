@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import json
 from types import SimpleNamespace
-from datetime import datetime
 import sys
 sys.path.append("..")
 import nlp
@@ -27,7 +26,7 @@ def parse(url):
         tags.append(i.text)
 
     ## R & R
-    linkz = soup.select("div.col-xs-12.references-content > ul > li")
+    linkz = soup.select("div.col-xs-12.references-content li")
     links = []
     for i in linkz:
         links.append(i.text)
@@ -171,3 +170,7 @@ def process(parsed):
 
 
     return colIds
+
+if __name__ == '__main__':
+    t = parse("https://earthobservatory.nasa.gov/images/147350/spalte-splits")
+    print(t)

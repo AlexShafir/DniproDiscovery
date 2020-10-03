@@ -4,7 +4,11 @@ import json
 from types import SimpleNamespace
 
 def parse(url):
-    pass
+    return {
+        "title":"",
+        "text":"",
+        "date fields":""
+    }
 
 def process(parsed):
     pass

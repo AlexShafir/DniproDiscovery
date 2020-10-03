@@ -136,7 +136,8 @@ def process(parsed):
         if(tag not in final_tags):
             final_tags.append(tag)
 
-    print(f'best tags: {final_tags[:20]}')
+    final_tags = final_tags[:20]
+    # print(f'best tags: {final_tags[:20]}')
     # location processing:
     # print(f'best locations: {from_text_locations[:10]}')
 
@@ -211,4 +212,5 @@ def process(parsed):
 if __name__ == '__main__':
     t = parse("https://earthobservatory.nasa.gov/images/147350/spalte-splits")
     print(t)
+    print()
 

@@ -127,7 +127,7 @@ class TextAnalysis:
                     res[loc.lower()][1] += 1
                 else:
                     res[loc.lower()] = [coords,1]
-        print(f'In text locations:{res}')
+        # print(f'In text locations:{res}')
         locations = []
         for key in res.keys():
             locations.append(res[key])
@@ -189,20 +189,20 @@ def main(title, text, args):
     text_tags = tA.spaCy_tags(tA.text)
     print(f"spaCy text tags: {text_tags}")
 
-    print(f"In text instruments:{tA.instruments_extraction(text_tags)}")
-    print(f"In text platforms:{tA.platforms__extraction(text_tags)}")
-    print(f"In text locations:{tA.locations_extraction(text_tags)}")
-    print(f"In text dates:{tA.dates_extraction(text_tags)}")
-    print(f"In text keywords:{tA.keywords_extraction(tA.text)}")
+    # print(f"In text instruments:{tA.instruments_extraction(text_tags)}")
+    # print(f"In text platforms:{tA.platforms__extraction(text_tags)}")
+    # print(f"In text locations:{tA.locations_extraction(text_tags)}")
+    # print(f"In text dates:{tA.dates_extraction(text_tags)}")
+    # print(f"In text keywords:{tA.keywords_extraction(tA.text)}")
 
     print("\n TITLE INFO: ")
     title_tags = tA.spaCy_tags(tA.title)
     print(f"spaCy title tags: {title_tags}")
-
-    print(f"In title instruments:{tA.instruments_extraction(title_tags)}")
-    print(f"In title platforms:{tA.platforms__extraction(title_tags)}")
-    print(f"In title locations:{tA.locations_extraction(title_tags)}")
-    print(f"In title years:{tA.dates_extraction(title_tags)}")
+    #
+    # print(f"In title instruments:{tA.instruments_extraction(title_tags)}")
+    # print(f"In title platforms:{tA.platforms__extraction(title_tags)}")
+    # print(f"In title locations:{tA.locations_extraction(title_tags)}")
+    # print(f"In title years:{tA.dates_extraction(title_tags)}")
 
 
 

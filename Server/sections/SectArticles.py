@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 from types import SimpleNamespace
+import re
 
 def parse(url):
     res = requests.get(url)
@@ -10,6 +11,12 @@ def parse(url):
 
     ## Title
     title = soup.find("meta", attrs={"name": "DC.Title"})['content']
+
+    ## Publish Year
+    t = soup.find("meta", attrs={"name": "DC.Date"})['content']
+    match = re.match(r'.*([1-2][0-9]{3})', t)
+    if match is not None:
+        publishYear = int(match.group(1))
 
     ## Text
     articleP = soup.select('div.col-lg-8.col-md-8.col-sm-8.col-xs-12.col-md-right-space p')
@@ -34,14 +41,14 @@ def parse(url):
     pictureText = []
     for i in picturr:
         pictureText.append(i.text)
-    print(pictureText)
 
     return {
         "title": title,
+        "publishYear": publishYear,
         "tags": tags,
         "R&R": links,
         "pictureText": pictureText,
-        "text": articleText
+        "text": articleText,
     }
 
 def process(parsed):

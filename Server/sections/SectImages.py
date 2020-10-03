@@ -19,6 +19,12 @@ def parse(url):
     ## Title
     title = soup.find("meta", attrs={"name":"DC.Title"})['content']
 
+    ## Publish Year
+    t = soup.find("meta", attrs={"name": "DC.Date"})['content']
+    match = re.match(r'.*([1-2][0-9]{3})', t)
+    if match is not None:
+        publishYear = int(match.group(1))
+
     ## Tags
     tagz = soup.select("a.btn.btn-tag.hvr-rectangle-in.btn-sm")
     tags = []
@@ -85,6 +91,7 @@ def parse(url):
         "platInstr": platInstr,
         "coord": [lat, lon],
         "title": title,
+        "publishYear": publishYear,
         "tags": tags,
         "dates": dates,
         "R&R": links,

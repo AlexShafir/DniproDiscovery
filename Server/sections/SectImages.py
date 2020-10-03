@@ -61,15 +61,33 @@ def parse(url):
     dates = list(set(dates))
     """
 
-    ## todo: Provider
+    return {
+        "platInstr": platInstr,
+        "coord": [lat, lon],
 
+    }
+
+def processParsed(dict):
+    """
+
+    :param dict: Must contain "platInstr", "coord"
+    :type dict: dict
+
+    :return: list of ids
+    :rtype: list
+
+    """
+
+    lat, lon = dict["coord"]
+    platInstr = dict["platInstr"]
 
     # Now we have everything from article and can filter results
     colIds = []
 
     for item in platInstr:
         plat, instr = item
-        res = requests.get(f"https://cmr.earthdata.nasa.gov/search/collections.json?point={lon},{lat}&platform={plat}&instrument={instr}&has_granules=true&pretty=true")
+        res = requests.get(
+            f"https://cmr.earthdata.nasa.gov/search/collections.json?point={lon},{lat}&platform={plat}&instrument={instr}&has_granules=true&pretty=true")
         items = json.loads(res.text, object_hook=lambda d: SimpleNamespace(**d))
 
         # Iterate collections
@@ -77,7 +95,8 @@ def parse(url):
         for e in items.feed.entry:
 
             # Filter by granules
-            res = requests.get(f"https://cmr.earthdata.nasa.gov/search/granules.json?collection_concept_id={e.id}&point={lon},{lat}&pretty=true")
+            res = requests.get(
+                f"https://cmr.earthdata.nasa.gov/search/granules.json?collection_concept_id={e.id}&point={lon},{lat}&pretty=true")
             granules = json.loads(res.text, object_hook=lambda d: SimpleNamespace(**d))
 
             if len(granules.feed.entry) == 0: continue
@@ -85,7 +104,7 @@ def parse(url):
             colIds.append([e.title, e.id])
 
             """
-    
+
             if hasattr(e, 'time_end'):
                 dateEnd = datetime.strptime(e.time_start, '%Y-%m-%dT%H:%M:%S.%fZ')
                 atleastEnd = False
@@ -93,21 +112,19 @@ def parse(url):
                     if dateEnd > date:
                         atleastEnd = True
                         break
-    
+
                 if not atleastEnd: continue
-    
+
             atleastStart = False
             dateStart = datetime.strptime(e.time_start, '%Y-%m-%dT%H:%M:%S.%fZ')
             for date in dates:
                 if dateStart < date:
                     atleastStart = True
                     break
-    
+
             if not atleastStart: continue
             """
 
-
-        #print(res.text)
+        # print(res.text)
 
     return colIds
-    # First execute search using location

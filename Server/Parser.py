@@ -1,9 +1,9 @@
-import image
+import SectImage
 
 def parse(url):
     ids = []
     if 'image' in url:
-        ids = image.parse(url)
+        ids = SectImage.parse(url)
 
     # Convert ids to links
     out = {}

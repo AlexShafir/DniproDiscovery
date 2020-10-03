@@ -67,7 +67,7 @@ def parse(url):
 
     }
 
-def processParsed(dict):
+def process(dict):
     """
 
     :param dict: Must contain "platInstr", "coord"

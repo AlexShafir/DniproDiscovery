@@ -118,19 +118,34 @@ def process(parsed):
     if(len(platInstr)==0):
         def generate_all_pairs(platforms, instruments):
             res = []
+            if(len(platforms) == 0 and len(instruments) == 0):
+                pass
+            elif(len(platforms) > 0 and len(instruments) == 0):
+                res = [[plt, None] for plt in platforms]
+            elif(len(platforms) == 0 and len(instruments) > 0):
+                res = [[None, instr] for instr in instruments]
             for plt in platforms:
                 for instr in instruments:
                     res.append([plt,instr])
             return res
         platInstr = generate_all_pairs(from_text_platforms, from_text_instruments)
-    # todo: add search by only platfrom or by only instrument
+    if (len(platInstr) == 0):
+        platInstr = [[None, None]]
     for item in platInstr:
+
         plat, instr = item
-        res = requests.get(
-            f"https://cmr.earthdata.nasa.gov/search/collections.json?point={lon},{lat}&platform={plat}&instrument={instr}&has_granules=true&pretty=true")
+        if(plat==None and instr == None):
+            search_url = f"https://cmr.earthdata.nasa.gov/search/collections.json?point={lon},{lat}&has_granules=true&pretty=true"
+        elif(plat!=None and instr == None):
+            search_url = f"https://cmr.earthdata.nasa.gov/search/collections.json?point={lon},{lat}&platform={plat}&has_granules=true&pretty=true"
+        elif(plat==None and instr != None):
+            search_url = f"https://cmr.earthdata.nasa.gov/search/collections.json?point={lon},{lat}&instrument={instr}&has_granules=true&pretty=true"
+        else:
+            search_url = f"https://cmr.earthdata.nasa.gov/search/collections.json?point={lon},{lat}&platform={plat}&instrument={instr}&has_granules=true&pretty=true"
+        res = requests.get(search_url)
         items = json.loads(res.text, object_hook=lambda d: SimpleNamespace(**d))
 
-        # Iterate collections
+            # Iterate collections
 
         for e in items.feed.entry:
 

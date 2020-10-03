@@ -1,9 +1,11 @@
-import SectImage
+import sections.SectImages as SectImages
 
 def parse(url):
-    ids = []
-    if 'image' in url:
-        ids = SectImage.parse(url)
+
+    # Images:
+    if 'https://earthobservatory.nasa.gov/images/' in url:
+        parsed = SectImages.parse(url)
+        ids = SectImages.processParsed(parsed)
 
     # Convert ids to links
     out = {}

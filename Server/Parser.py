@@ -26,7 +26,6 @@ def parse(url):
     return out
 
 
-
 if __name__ == '__main__':
 
 
@@ -73,5 +72,4 @@ The Washington Post (2020, October 1) California wildfires prompt new warnings a
         "coord": ['46.866880494515', '-89.99947993713'],
     }
     ids = SectImages.process(parsed)
-
 

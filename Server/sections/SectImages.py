@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import json
 from types import SimpleNamespace
-from datetime import datetime
 import sys
 sys.path.append("..")
 import nlp, nlp_constants
@@ -20,6 +19,12 @@ def parse(url):
     ## Title
     title = soup.find("meta", attrs={"name":"DC.Title"})['content']
 
+    ## Publish Year
+    t = soup.find("meta", attrs={"name": "DC.Date"})['content']
+    match = re.match(r'.*([1-2][0-9]{3})', t)
+    if match is not None:
+        publishYear = int(match.group(1))
+
     ## Tags
     tagz = soup.select("a.btn.btn-tag.hvr-rectangle-in.btn-sm")
     tags = []
@@ -29,7 +34,7 @@ def parse(url):
             tags.append(i.text.lower())
 
     ## R & R
-    linkz = soup.select("div.col-xs-12.references-content > ul > li")
+    linkz = soup.select("div.col-xs-12.references-content li")
     links = []
     for i in linkz:
         links.append(i.text)
@@ -77,6 +82,7 @@ def parse(url):
         "platInstr": platInstr,
         "coord": [lat, lon],
         "title": title,
+        "publishYear": publishYear,
         "tags": tags,
         "dates": dates,
         "R&R": links,
@@ -181,7 +187,8 @@ def process(parsed):
             if len(granules.feed.entry) == 0: continue
 
             colIds.append([e.title, e.id, e.summary])
-    print(f'Results: {colIds}')
+            
+    # print(f'Results: {colIds}')
 
     Ordered_colIds = []
     def sort_by_keywords():
@@ -198,5 +205,10 @@ def process(parsed):
 
     Ordered_colIds = sort_by_keywords()
 
-    print(f'Ordered result: {Ordered_colIds}')
+    #print(f'Ordered result: {Ordered_colIds}')
     return Ordered_colIds[:10]
+
+if __name__ == '__main__':
+    t = parse("https://earthobservatory.nasa.gov/images/147350/spalte-splits")
+    print(t)
+

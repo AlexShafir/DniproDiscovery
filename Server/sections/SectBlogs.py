@@ -64,27 +64,27 @@ def generate_search_url(plat,instruments, lat_long):
     search_url = base_part +  plat_part + instr_part + loc_part + end_part
     return search_url
 
-def generate_tags_search_url(tags):
+def generate_tag_search_url(tag):
 
     base_part = f"https://cmr.earthdata.nasa.gov/search/collections.json?"
 
-    keyword_part = f"keyword ="
-    for tag in tags:
-        keyword_part+=tag + "%20"
+    keyword_part = f"keyword={tag}&"
 
     end_part = "has_granules=true&pretty=true"
 
     search_url = base_part +  keyword_part + end_part
     return search_url
 
-def sort_by_keywords(colIds, final_tags):
+def datasets_sorting(colIds, final_tags):
+    # colIds = {id: [title, id, summary, has_location, has_platform, has_instrument]}
     res = []
-    for title in colIds.keys():
-        dataset_score = 10* colIds[title][3]
-        text = colIds[title][0].lower() + colIds[title][2].lower()
+    for id in colIds.keys():
+        title, id_, summary, has_location, has_platform, has_instrument = colIds[id]
+        dataset_score = 100 * has_platform + 50*has_instrument + 20*has_location
+        text = colIds[id][0].lower() + colIds[id][2].lower()
         for i, keyword in enumerate(final_tags):
             dataset_score += (25 - i) * text.count(keyword)
-        res.append([colIds[title][0], colIds[title][1], dataset_score])
+        res.append([colIds[id][0], colIds[id][1], dataset_score])
     res.sort(key=lambda x: x[2], reverse=True)
     print(f'SORTED results:')
     for el in res:
@@ -93,27 +93,31 @@ def sort_by_keywords(colIds, final_tags):
     res = [[el[0], el[1]] for el in res]
     return res
 
-def colIds_from_url(colIds, url, lat_long):
+
+def colIds_from_url(colIds, url, lat_long, plat, has_instrument):
+    # colIds = {id: [title, id, summary, has_location, has_platform, has_instrument]}
+    if(plat==None):
+        has_platform = 0
+    else:
+        has_platform = 1
     res = requests.get(url)
     items = json.loads(res.text, object_hook=lambda d: SimpleNamespace(**d))
     for e in items.feed.entry:
-        if (lat_long == [[None,None]]):
-            if (e.title not in colIds.keys()):
-                colIds[e.title] = [e.title, e.id, e.summary, 0]
-            else:
-                pass
+        if (lat_long == [None,None]):
+            has_location = 0
         else: # Check granules by location
+            lat, lon = lat_long
             collection_url = f"https://cmr.earthdata.nasa.gov/search/granules.json?collection_concept_id={e.id}&point={lon},{lat}&pretty=true"
             res = requests.get(collection_url)
             granules = json.loads(res.text, object_hook=lambda d: SimpleNamespace(**d))
-
             if len(granules.feed.entry) == 0:
                 continue
             else:
-                if (e.title not in colIds.keys()):
-                    colIds[e.title] = [e.title, e.id, e.summary, 1]
-                else:
-                    pass
+                has_location = 1
+        if (e.id not in colIds.keys()):
+            colIds[e.id] = [e.title, e.id, e.summary, has_location, has_platform, has_instrument]
+        else:
+            pass
 
     return colIds
 
@@ -204,29 +208,32 @@ def process(parsed):
 
     colIds = {}
 
-    if(len(from_text_platforms)==0 and len(from_text_locations) == 0 and len(from_text_instruments) == 0):
-        print("No important infro, search by tags")
-        search_url = generate_tags_search_url(final_tags)
-        colIds = colIds_from_url(colIds, search_url, [None, None])
-    else:
-        if(len(from_text_platforms)==0):
-            from_text_platforms = [None]
-        if(len(from_text_locations)==0):
-            from_text_locations = [[None,None]]
+    # Platforms > instruments > locations > tags
+    if(len(from_text_platforms)==0):
+        from_text_platforms = [None]
+    if(len(from_text_locations)==0):
+        from_text_locations = [[None,None]]
 
-        # search by platform, all instruments and concrete location
+    # search by platform, all instruments and concrete location
+    for plat in from_text_platforms:
+        for lat_long in from_text_locations:
+            search_url = generate_search_url(plat, from_text_instruments, lat_long)
+            colIds = colIds_from_url(colIds, search_url, lat_long)
+
+    # If we don't have enought results, we drop search by location
+    if (len(colIds.keys()) < 10 and from_text_locations!=[[None,None]]):
         for plat in from_text_platforms:
-            for lat_long in from_text_locations:
-                search_url = generate_search_url(plat, from_text_instruments, lat_long)
-                colIds = colIds_from_url(colIds, search_url, lat_long)
+            search_url = generate_search_url(plat, from_text_instruments, [None,None])
+            colIds = colIds_from_url(colIds, search_url, [None,None])
 
-        # If we don't have enought results, we drop search by location
-        if (len(colIds.keys()) < 10 and from_text_locations!=[[None,None]]):
-            for plat in from_text_platforms:
-                search_url = generate_search_url(plat, from_text_instruments, [None,None])
-                colIds = colIds_from_url(colIds, search_url, [None,None])
+    if(len(colIds.keys()) < 10):
+        print(f'By platform, instrument and location found: {len(colIds.keys())} datasets. Continue seach by tags')
+        for tag in final_tags:
+            search_url = generate_tag_search_url(tag)
+            colIds = colIds_from_url(colIds, search_url, [None, None])
 
-    Ordered_colIds = sort_by_keywords(colIds, final_tags)
+
+    Ordered_colIds = datasets_sorting(colIds, final_tags)
 
     # print(f'Ordered result: {Ordered_colIds}')
     return Ordered_colIds[:10]

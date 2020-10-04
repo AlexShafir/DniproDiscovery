@@ -30,17 +30,17 @@ if __name__ == '__main__':
     # image examples
     # res = parse("https://earthobservatory.nasa.gov/images/147342/superior-fall-colors")
     # res = parse("https://earthobservatory.nasa.gov/images/147350/spalte-splits")
-    # for i, el in enumerate(res):
-    #     print(f"{i} : {el}")
 
     # article examples
-    # res = parse("https://earthobservatory.nasa.gov/features/covid-seasonality")
     # res = parse("https://earthobservatory.nasa.gov/features/disease-vector")
-    # for i, el in enumerate(res):
-    #     print(f"{i} : {el}")
+    # res = parse("https://earthobservatory.nasa.gov/features/covid-seasonality")
+    # res = parse("https://earthobservatory.nasa.gov/features/pine-island")
 
     # blog example
-    res = parse("https://earthobservatory.nasa.gov/blogs/earthmatters/2016/08/17/perseids-or-sporadic-meteors-maybe-both/")
+    # res = parse("https://earthobservatory.nasa.gov/blogs/earthmatters/2016/08/17/perseids-or-sporadic-meteors-maybe-both/")
+    res = parse("https://earthobservatory.nasa.gov/blogs/fromthefield/2020/09/23/polarstern-at-the-north-pole/")
+
+
     for i, el in enumerate(res):
         print(f"{i} : {el}")
 

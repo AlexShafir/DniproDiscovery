@@ -6,7 +6,7 @@ import sys
 sys.path.append("..")
 import nlp, nlp_constants
 import re
-
+global SSL_requests_counter
 
 def tags_fusion(parced_tags, from_text_tags, tags_max=20):
     final_tags = []  # fusion of text tags and predefined tags
@@ -25,19 +25,6 @@ def tags_fusion(parced_tags, from_text_tags, tags_max=20):
     final_tags = final_tags[:tags_max]
     return final_tags
 
-def generate_all_pairs(platforms, instruments):
-    res = []
-    if (len(platforms) == 0 and len(instruments) == 0):
-        pass
-    elif (len(platforms) > 0 and len(instruments) == 0):
-        res = [[plt, None] for plt in platforms]
-    elif (len(platforms) == 0 and len(instruments) > 0):
-        res = [[None, instr] for instr in instruments]
-    for plt in platforms:
-        for instr in instruments:
-            res.append([plt, instr])
-    return res
-
 def generate_search_url(plat,instruments, lat_long):
 
     base_part = f"https://cmr.earthdata.nasa.gov/search/collections.json?"
@@ -45,7 +32,7 @@ def generate_search_url(plat,instruments, lat_long):
     # platform search
     plat_part = ""
     if(plat!=None):
-        plat_part = f"platform={plat}"
+        plat_part = f"platform={plat}&"
 
     # instruments search
     instr_part = ""
@@ -93,8 +80,9 @@ def datasets_sorting(colIds, final_tags):
     res = [[el[0], el[1]] for el in res]
     return res
 
-
 def colIds_from_url(colIds, url, lat_long, plat, has_instrument):
+    global SSL_requests_counter
+
     # colIds = {id: [title, id, summary, has_location, has_platform, has_instrument]}
     if(plat==None):
         has_platform = 0
@@ -105,15 +93,18 @@ def colIds_from_url(colIds, url, lat_long, plat, has_instrument):
     for e in items.feed.entry:
         if (lat_long == [None,None]):
             has_location = 0
-        else: # Check granules by location
+        elif (SSL_requests_counter < 10):  # Check granules by location
             lat, lon = lat_long
             collection_url = f"https://cmr.earthdata.nasa.gov/search/granules.json?collection_concept_id={e.id}&point={lon},{lat}&pretty=true"
             res = requests.get(collection_url)
+            SSL_requests_counter += 1
             granules = json.loads(res.text, object_hook=lambda d: SimpleNamespace(**d))
             if len(granules.feed.entry) == 0:
                 continue
             else:
                 has_location = 1
+        else:
+            has_location = 0.25
         if (e.id not in colIds.keys()):
             colIds[e.id] = [e.title, e.id, e.summary, has_location, has_platform, has_instrument]
         else:
@@ -161,7 +152,7 @@ def parse(url):
         "text": articleText,
     }
 
-def process(parsed):
+def process(parsed, results_num = 10):
     """
 
     :param parsed:
@@ -177,12 +168,18 @@ def process(parsed):
 
     """
 
+    global SSL_requests_counter
+    SSL_requests_counter = 0
     ### ================================ P A R S E D    D A T A ===========================
     title = parsed["title"]
     text = parsed["text"]
-    parced_tags = parsed["tags"]
+    parsed_tags = parsed["tags"]
     publishYear = parsed["publishYear"]
     pictureText = parsed["pictureText"]
+
+    print(f"Processed data:")
+    print(f"parsed_tags:{parsed_tags}")
+    print(f"publishYear:{publishYear}")
 
     ### ================================ T E X T    D A T A ==============================
 
@@ -196,15 +193,14 @@ def process(parsed):
     from_text_dates = tA.dates_extraction(text_tags)
     from_text_tags = tA.keywords_extraction(tA.text, 10)
 
-    # Tags processing
-
-    # location processing:
-    # print(f'best locations: {from_text_locations[:10]}')
-
+    print(f"Text data:")
+    print(f"from_text_instruments:{from_text_instruments}")
+    print(f"from_text_platforms:{from_text_platforms}")
+    print(f"from_text_tags:{from_text_tags}")
     ### ================================ P R O C E S S I N G =============================
 
     # tags creation
-    final_tags = tags_fusion(parced_tags, from_text_tags, 20)
+    final_tags = tags_fusion(parsed_tags, from_text_tags, 20)
 
     colIds = {}
     # colIds format:
@@ -222,12 +218,12 @@ def process(parsed):
             colIds = colIds_from_url(colIds, search_url, lat_long, plat, 1)
 
     # If we don't have enought results, we drop search by location
-    if (len(colIds.keys()) < 10 and from_text_locations!=[[None,None]]):
+    if (len(colIds.keys()) < results_num and from_text_locations!=[[None,None]]):
         for plat in from_text_platforms:
             search_url = generate_search_url(plat, from_text_instruments, [None,None])
             colIds = colIds_from_url(colIds, search_url, [None,None], plat, 1)
 
-    if(len(colIds.keys()) < 10):
+    if(len(colIds.keys()) < results_num):
         print(f'By platform, instrument and location found: {len(colIds.keys())} datasets. Continue seach by tags')
         for tag in final_tags:
             search_url = generate_tag_search_url(tag)
@@ -237,7 +233,7 @@ def process(parsed):
     Ordered_colIds = datasets_sorting(colIds, final_tags)
 
     # print(f'Ordered result: {Ordered_colIds}')
-    return Ordered_colIds[:10]
+    return Ordered_colIds[:results_num]
 
 if __name__ == '__main__':
     t = parse("https://earthobservatory.nasa.gov/blogs/earthmatters/2020/06/29/nasa-esa-and-jaxa-provide-global-observations-of-covid-19-impacts/")

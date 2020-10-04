@@ -66,10 +66,10 @@ def datasets_sorting(colIds, final_tags):
     res = []
     for id in colIds.keys():
         title, id_, summary, has_location, has_platform, has_instrument = colIds[id]
-        dataset_score = 100 * has_platform + 50*has_instrument + 20*has_location
+        dataset_score = 100 * has_platform + 100*has_instrument + 100*has_location
         text = colIds[id][0].lower() + colIds[id][2].lower()
         for i, keyword in enumerate(final_tags):
-            dataset_score += (25 - i) * text.count(keyword)
+            dataset_score += (25 - i)/5 * text.count(keyword)
         res.append([colIds[id][0], colIds[id][1], dataset_score])
     res.sort(key=lambda x: x[2], reverse=True)
     print(f'SORTED results:')

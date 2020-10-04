@@ -207,7 +207,8 @@ def process(parsed):
     final_tags = tags_fusion(parced_tags, from_text_tags, 20)
 
     colIds = {}
-
+    # colIds format:
+    #     dataset.id: [title, id, summary, has_location, has_platform, has_instrument]
     # Platforms > instruments > locations > tags
     if(len(from_text_platforms)==0):
         from_text_platforms = [None]
@@ -218,19 +219,19 @@ def process(parsed):
     for plat in from_text_platforms:
         for lat_long in from_text_locations:
             search_url = generate_search_url(plat, from_text_instruments, lat_long)
-            colIds = colIds_from_url(colIds, search_url, lat_long)
+            colIds = colIds_from_url(colIds, search_url, lat_long, plat, 1)
 
     # If we don't have enought results, we drop search by location
     if (len(colIds.keys()) < 10 and from_text_locations!=[[None,None]]):
         for plat in from_text_platforms:
             search_url = generate_search_url(plat, from_text_instruments, [None,None])
-            colIds = colIds_from_url(colIds, search_url, [None,None])
+            colIds = colIds_from_url(colIds, search_url, [None,None], plat, 1)
 
     if(len(colIds.keys()) < 10):
         print(f'By platform, instrument and location found: {len(colIds.keys())} datasets. Continue seach by tags')
         for tag in final_tags:
             search_url = generate_tag_search_url(tag)
-            colIds = colIds_from_url(colIds, search_url, [None, None])
+            colIds = colIds_from_url(colIds, search_url, [None, None],None, 0)
 
 
     Ordered_colIds = datasets_sorting(colIds, final_tags)

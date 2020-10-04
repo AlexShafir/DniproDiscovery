@@ -34,10 +34,11 @@ if __name__ == '__main__':
     # article examples
     # res = parse("https://earthobservatory.nasa.gov/features/disease-vector")
     # res = parse("https://earthobservatory.nasa.gov/features/covid-seasonality")
-    res = parse("https://earthobservatory.nasa.gov/features/pine-island")
+    # res = parse("https://earthobservatory.nasa.gov/features/pine-island")
 
     # blog example
     # res = parse("https://earthobservatory.nasa.gov/blogs/earthmatters/2016/08/17/perseids-or-sporadic-meteors-maybe-both/")
+    res = parse("https://earthobservatory.nasa.gov/blogs/fromthefield/2020/09/23/polarstern-at-the-north-pole/")
 
 
     for i, el in enumerate(res):

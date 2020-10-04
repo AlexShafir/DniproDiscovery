@@ -92,7 +92,15 @@ def parse(url):
 def process(parsed):
     """
 
-    :param parsed: Must contain "platInstr", "coord"
+    :param parsed:
+        "platInstr": platInstr,
+        "coord": [lat, lon],
+        "title": title,
+        "publishYear": publishYear,
+        "tags": tags,
+        "dates": dates,
+        "R&R": links,
+        "text": articleText
     :type parsed: dict
 
     :return: list of ids

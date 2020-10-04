@@ -5,15 +5,15 @@
 
 import requests
 
-# NLTK part
-import nltk
-
-# todo: run only once:
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
-
-from nltk.tokenize import word_tokenize
-from nltk.tag import pos_tag
+# # NLTK part
+# import nltk
+#
+# # todo: run only once:
+# nltk.download('punkt')
+# nltk.download('averaged_perceptron_tagger')
+#
+# from nltk.tokenize import word_tokenize
+# from nltk.tag import pos_tag
 NLTK_interesting_tags = []
 
 # spaCy part
@@ -66,16 +66,16 @@ class TextAnalysis:
         self.text = text # text of the article
         self.args = args # additional arguments: (Table of contents, References & Resources, etc)
 
-    # todo: delete
-    def preprocess(self, text):
-        data = nltk.word_tokenize(text)
-        data = nltk.pos_tag(data)
-        return data
-
-    # todo: delete
-    def NLTK_tags(self, text):
-        res = self.preprocess(text)
-        return res
+    # # todo: delete
+    # def preprocess(self, text):
+    #     data = nltk.word_tokenize(text)
+    #     data = nltk.pos_tag(data)
+    #     return data
+    #
+    # # todo: delete
+    # def NLTK_tags(self, text):
+    #     res = self.preprocess(text)
+    #     return res
 
     def spaCy_tags(self, text):
         # nlp = en_core_web_sm.load()
@@ -121,18 +121,24 @@ class TextAnalysis:
 
         res = {}
         for loc in locations:
-            coords = extract_lat_long_via_address(loc)
-            if(coords[0]!=None):
-                if(loc.lower() in res.keys()):
-                    res[loc.lower()][1] += 1
-                else:
-                    res[loc.lower()] = [coords,1]
-        # print(f'In text locations:{res}')
+            if(loc.lower() in res.keys()):
+                res[loc.lower()][2] += 1
+            else:
+                res[loc.lower()] = [loc,[],1]
+
+        for loc in res.keys():
+            lat_long = extract_lat_long_via_address(loc)
+            if(lat_long[0]!=None):
+                res[loc][1] = lat_long
+
         locations = []
         for key in res.keys():
-            locations.append(res[key])
-        locations.sort(key = lambda x: x[1], reverse=True)
-        best_locations = [loc[0] for loc in locations if loc[1]>3]
+            if(len(res[key][1])!=0):
+                locations.append(res[key])
+
+        locations.sort(key = lambda x: x[2], reverse=True)
+        print(f"from text locations: {locations}")
+        best_locations = [loc[1] for loc in locations if loc[2]>3]
         return best_locations
 
     def dates_extraction(self, pairs):

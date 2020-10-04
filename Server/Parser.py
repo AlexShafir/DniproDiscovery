@@ -27,18 +27,20 @@ def parse(url):
 
 
 if __name__ == '__main__':
-    # image example
+    # image examples
     # res = parse("https://earthobservatory.nasa.gov/images/147342/superior-fall-colors")
-    res = parse("https://earthobservatory.nasa.gov/images/147350/spalte-splits")
-    for i, el in enumerate(res):
-        print(f"{i} : {el}")
-    """
-    
-    
-    # article example
+    # res = parse("https://earthobservatory.nasa.gov/images/147350/spalte-splits")
+    # for i, el in enumerate(res):
+    #     print(f"{i} : {el}")
+
+    # article examples
     # res = parse("https://earthobservatory.nasa.gov/features/covid-seasonality")
+    # res = parse("https://earthobservatory.nasa.gov/features/disease-vector")
+    # for i, el in enumerate(res):
+    #     print(f"{i} : {el}")
 
     # blog example
-    # res = parse("https://earthobservatory.nasa.gov/blogs/earthmatters/category/reader-mail/")
-    # print(f'res: {res}')
-    """
+    res = parse("https://earthobservatory.nasa.gov/blogs/earthmatters/2016/08/17/perseids-or-sporadic-meteors-maybe-both/")
+    for i, el in enumerate(res):
+        print(f"{i} : {el}")
+

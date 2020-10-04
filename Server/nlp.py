@@ -38,6 +38,7 @@ import nlp_constants
 from nlp_constants import title, text, args
 
 import re
+import time
 
 def extract_lat_long_via_address(address_or_zipcode):
     lat, lng = None, None
@@ -114,17 +115,21 @@ class TextAnalysis:
         :param pairs: pairs of words and tags  ('More than a week', 'DATE') or ('good', 'JJ')
         :return: coordinates of suiting locations
         """
+        timer_start = time.time()
         locations = [pair for pair in pairs if pair[1] in spaCy_location_tags]
 
         locations = [loc[0] for loc in locations if( len(loc[0]) > 3  and
                                                   loc[0]!='Earth')]
 
         res = {}
+        # count each location
         for loc in locations:
             if(loc.lower() in res.keys()):
                 res[loc.lower()][2] += 1
             else:
                 res[loc.lower()] = [loc,[],1]
+
+        res = {loc:res[loc] for loc in res.keys() if res[loc][2]>3}
 
         for loc in res.keys():
             lat_long = extract_lat_long_via_address(loc)
@@ -137,8 +142,9 @@ class TextAnalysis:
                 locations.append(res[key])
 
         locations.sort(key = lambda x: x[2], reverse=True)
-        print(f"from text locations: {locations}")
+        # print(f"from text locations: {locations}")
         best_locations = [loc[1] for loc in locations if loc[2]>3]
+        print(f"Time spent on location search: {time.time()-timer_start}")
         return best_locations
 
     def dates_extraction(self, pairs):
